@@ -25,7 +25,7 @@ import useAnimatedComponents from "./hooks/useAnimatedComponents";
 import useImageIndexChange from "./hooks/useImageIndexChange";
 import useRequestClose from "./hooks/useRequestClose";
 
-interface ViewSource {
+export interface ViewSource {
   type: "image" | "view";
   children?: JSX.Element;
   source?: ImageSource;
@@ -36,7 +36,7 @@ type Props = {
   imageIndex: number;
   visible: boolean;
   onRequestClose: () => void;
-  onLongPress?: (image: ImageSource) => void;
+  onLongPress?: (image: ViewSource) => void;
   onImageIndexChange?: (imageIndex: number) => void;
   presentationStyle?: ModalProps["presentationStyle"];
   animationType?: ModalProps["animationType"];
@@ -140,7 +140,7 @@ function ImageViewing({
               return (
                 <ImageItem
                   onZoom={onZoom}
-                  imageSrc={item.source as ImageSource}
+                  imageItem={item}
                   onRequestClose={onRequestCloseEnhanced}
                   onLongPress={onLongPress}
                   delayLongPress={delayLongPress}
@@ -152,12 +152,8 @@ function ImageViewing({
 
             return (
               <ViewItem
-                onZoom={onZoom}
                 onRequestClose={onRequestCloseEnhanced}
-                onLongPress={onLongPress}
-                delayLongPress={delayLongPress}
                 swipeToCloseEnabled={swipeToCloseEnabled}
-                doubleTapToZoomEnabled={doubleTapToZoomEnabled}
               >
                 {item.children as JSX.Element}
               </ViewItem>

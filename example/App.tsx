@@ -9,11 +9,13 @@
 import React, { useState } from "react";
 import {
   Alert,
+  Button,
   Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import get from "lodash/get";
@@ -90,9 +92,23 @@ export default function App() {
                   backgroundColor: "#ffff",
                   borderRadius: 10,
                   padding: 20,
+                  justifyContent: "space-between",
                 }}
               >
                 <Text style={{ color: "#000", fontSize: 20 }}>Helloo !</Text>
+
+                <TouchableOpacity
+                  style={{
+                    padding: 20,
+                    backgroundColor: "#ccc",
+                    borderRadius: 20,
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "#000", fontSize: 20 }}>Click me</Text>
+                </TouchableOpacity>
               </View>
             ),
           },

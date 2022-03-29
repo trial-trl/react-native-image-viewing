@@ -26,6 +26,7 @@ import useImageDimensions from "../../hooks/useImageDimensions";
 import { getImageStyles, getImageTransform } from "../../utils";
 import { ImageSource } from "../../@types";
 import { ImageLoading } from "./ImageLoading";
+import { ViewSource } from "../../ImageViewing";
 
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.55;
@@ -34,17 +35,17 @@ const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
 
 type Props = {
-  imageSrc: ImageSource;
+  imageItem: ViewSource;
   onRequestClose: () => void;
   onZoom: (scaled: boolean) => void;
-  onLongPress: (image: ImageSource) => void;
+  onLongPress: (image: ViewSource) => void;
   delayLongPress: number;
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
 };
 
 const ImageItem = ({
-  imageSrc,
+  imageItem,
   onZoom,
   onRequestClose,
   onLongPress,
@@ -55,7 +56,7 @@ const ImageItem = ({
   const scrollViewRef = useRef<ScrollView>(null);
   const [loaded, setLoaded] = useState(false);
   const [scaled, setScaled] = useState(false);
-  const imageDimensions = useImageDimensions(imageSrc);
+  const imageDimensions = useImageDimensions(imageItem);
   const handleDoubleTap = useDoubleTapToZoom(scrollViewRef, scaled, SCREEN);
 
   const [translate, scale] = getImageTransform(imageDimensions, SCREEN);
@@ -71,7 +72,7 @@ const ImageItem = ({
   const imagesStyles = getImageStyles(
     imageDimensions,
     translateValue,
-    scaleValue
+    scaleValue,
   );
   const imageStylesWithOpacity = { ...imagesStyles, opacity: imageOpacity };
 
@@ -91,7 +92,7 @@ const ImageItem = ({
         onRequestClose();
       }
     },
-    [scaled]
+    [scaled],
   );
 
   const onScroll = ({
@@ -108,11 +109,12 @@ const ImageItem = ({
 
   const onLongPressHandler = useCallback(
     (event: GestureResponderEvent) => {
-      onLongPress(imageSrc);
+      onLongPress(imageItem);
     },
-    [imageSrc, onLongPress]
+    [imageItem, onLongPress],
   );
 
+  console.log(imageDimensions);
   return (
     <View>
       <ScrollView
@@ -138,7 +140,7 @@ const ImageItem = ({
           delayLongPress={delayLongPress}
         >
           <Animated.Image
-            source={imageSrc}
+            source={imageItem?.source ?? {}}
             style={imageStylesWithOpacity}
             onLoad={() => setLoaded(true)}
           />
