@@ -15,7 +15,6 @@ import {
   SafeAreaView,
   StyleSheet,
 } from "react-native";
-import { ImageSource } from "../../@types";
 
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.75;
@@ -26,11 +25,7 @@ const SCREEN_HEIGHT = SCREEN.height;
 type Props = {
   children: JSX.Element;
   onRequestClose: () => void;
-  onZoom: (isZoomed: boolean) => void;
-  onLongPress: (image: ImageSource) => void;
-  delayLongPress: number;
   swipeToCloseEnabled?: boolean;
-  doubleTapToZoomEnabled?: boolean;
 };
 
 const ViewItem = ({
