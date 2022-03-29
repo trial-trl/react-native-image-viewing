@@ -46,9 +46,17 @@ export default function App() {
   const getImageSource = memoize((images): ImageSource[] =>
     images.map((image) =>
       typeof image.original === "number"
-        ? image.original
-        : { uri: image.original as string }
-    )
+        ? {
+            type: "image",
+            source: image.thumbnail,
+          }
+        : {
+            type: "image",
+            source: {
+              uri: image.original,
+            },
+          },
+    ),
   );
   const onLongPress = (image) => {
     Alert.alert("Long Pressed", image.uri);
@@ -70,7 +78,25 @@ export default function App() {
         <Text style={styles.name}>[ react-native-image-viewing ]</Text>
       </View>
       <ImageViewing
-        images={getImageSource(images)}
+        views={[
+          ...getImageSource(images),
+          {
+            type: "view",
+            children: (
+              <View
+                style={{
+                  height: 150,
+                  width: 250,
+                  backgroundColor: "#ffff",
+                  borderRadius: 10,
+                  padding: 20,
+                }}
+              >
+                <Text style={{ color: "#000", fontSize: 20 }}>Helloo !</Text>
+              </View>
+            ),
+          },
+        ]}
         imageIndex={currentImageIndex}
         presentationStyle="overFullScreen"
         visible={isVisible}
