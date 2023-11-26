@@ -10,29 +10,33 @@ import React, { ComponentType, useCallback, useRef, useEffect } from "react";
 import {
   Animated,
   Dimensions,
+  Modal,
+  ModalProps,
   StyleSheet,
   View,
   VirtualizedList,
-  ModalProps,
-  Modal,
 } from "react-native";
-
-import ImageItem from "./components/ImageItem/ImageItem";
+import { ImageSource } from "./@types";
 import ImageDefaultHeader from "./components/ImageDefaultHeader";
+import ImageItem from "./components/ImageItem/ImageItem";
 import StatusBarManager from "./components/StatusBarManager";
-
+import ViewItem from "./components/ViewItem/ViewItem";
 import useAnimatedComponents from "./hooks/useAnimatedComponents";
 import useImageIndexChange from "./hooks/useImageIndexChange";
 import useRequestClose from "./hooks/useRequestClose";
-import { ImageSource } from "./@types";
+
+export interface ViewSource {
+  type: "image" | "view";
+  children?: JSX.Element;
+  source?: ImageSource;
+}
 
 type Props = {
-  images: ImageSource[];
-  keyExtractor?: (imageSrc: ImageSource, index: number) => string;
+  views: ViewSource[];
   imageIndex: number;
   visible: boolean;
   onRequestClose: () => void;
-  onLongPress?: (image: ImageSource) => void;
+  onLongPress?: (image: ViewSource) => void;
   onImageIndexChange?: (imageIndex: number) => void;
   presentationStyle?: ModalProps["presentationStyle"];
   animationType?: ModalProps["animationType"];
@@ -51,8 +55,7 @@ const SCREEN = Dimensions.get("screen");
 const SCREEN_WIDTH = SCREEN.width;
 
 function ImageViewing({
-  images,
-  keyExtractor,
+  views,
   imageIndex,
   visible,
   onRequestClose,
@@ -114,8 +117,9 @@ function ImageViewing({
           )}
         </Animated.View>
         <VirtualizedList
+          //@ts-ignore
           ref={imageList}
-          data={images}
+          data={views}
           horizontal
           pagingEnabled
           windowSize={2}
@@ -124,33 +128,38 @@ function ImageViewing({
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           initialScrollIndex={imageIndex}
-          getItem={(_, index) => images[index]}
-          getItemCount={() => images.length}
+          getItem={(_, index) => views[index]}
+          getItemCount={() => views.length}
           getItemLayout={(_, index) => ({
             length: SCREEN_WIDTH,
             offset: SCREEN_WIDTH * index,
             index,
           })}
-          renderItem={({ item: imageSrc }) => (
-            <ImageItem
-              onZoom={onZoom}
-              imageSrc={imageSrc}
-              onRequestClose={onRequestCloseEnhanced}
-              onLongPress={onLongPress}
-              delayLongPress={delayLongPress}
-              swipeToCloseEnabled={swipeToCloseEnabled}
-              doubleTapToZoomEnabled={doubleTapToZoomEnabled}
-            />
-          )}
+          renderItem={({ item }: { item: ViewSource }) => {
+            if (item.type === "image") {
+              return (
+                <ImageItem
+                  onZoom={onZoom}
+                  imageItem={item}
+                  onRequestClose={onRequestCloseEnhanced}
+                  onLongPress={onLongPress}
+                  delayLongPress={delayLongPress}
+                  swipeToCloseEnabled={swipeToCloseEnabled}
+                  doubleTapToZoomEnabled={doubleTapToZoomEnabled}
+                />
+              );
+            }
+
+            return (
+              <ViewItem
+                onRequestClose={onRequestCloseEnhanced}
+                swipeToCloseEnabled={swipeToCloseEnabled}
+              >
+                {item.children as JSX.Element}
+              </ViewItem>
+            );
+          }}
           onMomentumScrollEnd={onScroll}
-          //@ts-ignore
-          keyExtractor={(imageSrc, index) =>
-            keyExtractor
-              ? keyExtractor(imageSrc, index)
-              : typeof imageSrc === "number"
-              ? `${imageSrc}`
-              : imageSrc.uri
-          }
         />
         {typeof FooterComponent !== "undefined" && (
           <Animated.View

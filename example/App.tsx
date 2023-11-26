@@ -9,11 +9,13 @@
 import React, { useState } from "react";
 import {
   Alert,
+  Button,
   Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import get from "lodash/get";
@@ -46,9 +48,17 @@ export default function App() {
   const getImageSource = memoize((images): ImageSource[] =>
     images.map((image) =>
       typeof image.original === "number"
-        ? image.original
-        : { uri: image.original as string }
-    )
+        ? {
+            type: "image",
+            source: image.thumbnail,
+          }
+        : {
+            type: "image",
+            source: {
+              uri: image.original,
+            },
+          },
+    ),
   );
   const onLongPress = (image) => {
     Alert.alert("Long Pressed", image.uri);
@@ -70,7 +80,39 @@ export default function App() {
         <Text style={styles.name}>[ react-native-image-viewing ]</Text>
       </View>
       <ImageViewing
-        images={getImageSource(images)}
+        views={[
+          ...getImageSource(images),
+          {
+            type: "view",
+            children: (
+              <View
+                style={{
+                  height: 150,
+                  width: 250,
+                  backgroundColor: "#ffff",
+                  borderRadius: 10,
+                  padding: 20,
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ color: "#000", fontSize: 20 }}>Helloo !</Text>
+
+                <TouchableOpacity
+                  style={{
+                    padding: 20,
+                    backgroundColor: "#ccc",
+                    borderRadius: 20,
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "#000", fontSize: 20 }}>Click me</Text>
+                </TouchableOpacity>
+              </View>
+            ),
+          },
+        ]}
         imageIndex={currentImageIndex}
         presentationStyle="overFullScreen"
         visible={isVisible}
